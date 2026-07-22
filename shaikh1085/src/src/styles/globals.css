@@ -1,0 +1,187 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * ─────────────────────────────────────────────────────────────────────
+ * DESIGN TOKENS
+ * ─────────────────────────────────────────────────────────────────────
+ * Every color in the product is expressed as an "H S% L%" triple here,
+ * then consumed through Tailwind as hsl(var(--token) / <alpha-value>).
+ * That indirection is what makes dark mode a single class swap instead
+ * of a second parallel color system threaded through every component.
+ *
+ * The --cat-1 … --cat-12 tokens are the "toolbox index" signature: 12
+ * real categories, 12 hues spaced exactly 30° apart around the wheel.
+ * See src/lib/constants/categories.ts for the category → token map.
+ * ───────────────────────────────────────────────────────────────────── */
+
+:root {
+  --background: 220 20% 98%;
+  --surface: 0 0% 100%;
+  --surface-raised: 220 25% 99%;
+  --border: 220 16% 91%;
+
+  --ink: 222 22% 11%;
+  --ink-muted: 220 10% 40%;
+  --ink-faint: 220 10% 60%;
+
+  --brand: 221 83% 58%;
+  --brand-hover: 221 83% 52%;
+  --brand-ink: 0 0% 100%;
+
+  --accent: 168 76% 39%;
+  --accent-hover: 168 76% 33%;
+
+  --danger: 356 75% 55%;
+  --warning: 38 92% 55%;
+  --success: 152 60% 40%;
+
+  --cat-1: 205 70% 54%;
+  --cat-2: 235 70% 58%;
+  --cat-3: 265 65% 58%;
+  --cat-4: 295 60% 56%;
+  --cat-5: 325 65% 56%;
+  --cat-6: 355 70% 58%;
+  --cat-7: 25 85% 55%;
+  --cat-8: 55 80% 48%;
+  --cat-9: 85 55% 42%;
+  --cat-10: 145 55% 40%;
+  --cat-11: 175 60% 38%;
+  --cat-12: 195 65% 45%;
+
+  color-scheme: light;
+}
+
+.dark {
+  --background: 222 32% 7%;
+  --surface: 220 26% 10%;
+  --surface-raised: 220 24% 13%;
+  --border: 220 18% 20%;
+
+  --ink: 210 30% 94%;
+  --ink-muted: 218 14% 66%;
+  --ink-faint: 218 12% 46%;
+
+  --brand: 221 90% 66%;
+  --brand-hover: 221 90% 72%;
+  --brand-ink: 222 32% 9%;
+
+  --accent: 168 70% 48%;
+  --accent-hover: 168 70% 54%;
+
+  --danger: 356 80% 62%;
+  --warning: 38 92% 60%;
+  --success: 152 55% 48%;
+
+  --cat-1: 205 75% 62%;
+  --cat-2: 235 75% 66%;
+  --cat-3: 265 70% 66%;
+  --cat-4: 295 65% 64%;
+  --cat-5: 325 70% 64%;
+  --cat-6: 355 75% 64%;
+  --cat-7: 25 88% 62%;
+  --cat-8: 55 85% 58%;
+  --cat-9: 85 60% 52%;
+  --cat-10: 145 60% 50%;
+  --cat-11: 175 65% 48%;
+  --cat-12: 195 70% 54%;
+
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-ink font-body antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-ink;
+  }
+
+  ::selection {
+    @apply bg-brand/20 text-ink;
+  }
+
+  /* Accessible, visible focus ring everywhere — never suppressed. */
+  :focus-visible {
+    outline: 2px solid hsl(var(--brand));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Slim, unobtrusive scrollbar that still respects both themes. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ink-faint/40 hover:bg-ink-faint/60;
+    border-radius: 999px;
+    border: 2px solid hsl(var(--background));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Reusable "card" surface — large radius, soft shadow, hairline border.
+     Used by tool cards, category cards, content panels across the site. */
+  .surface-card {
+    @apply bg-surface border border-border rounded-xl shadow-card;
+  }
+
+  /* Subtle blueprint/grid texture used behind the homepage hero — a nod
+     to precision instruments (rulers, drafting paper) without being loud. */
+  .bg-grid {
+    background-image:
+      linear-gradient(hsl(var(--ink) / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--ink) / 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .bg-grid-fade {
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+  }
+
+  /* Skeleton loading shimmer for lazy-loaded tool widgets. */
+  .skeleton {
+    @apply bg-border/60 rounded-md;
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--border)) 0%,
+      hsl(var(--surface-raised)) 50%,
+      hsl(var(--border)) 100%
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
